@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - CodeChef Verification</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔐 Admin Dashboard</h1>
+      <p class="subtitle">Manage verification requests</p>
+    </header>
+
+    <!-- Admin Login -->
+    <div id="admin-login" class="page active">
+      <div class="form-card">
+        <h2>Admin Login</h2>
+        <div class="form-group">
+          <input type="text" id="admin-username" placeholder="Username" />
+          <input type="password" id="admin-password" placeholder="Password" />
+          <button onclick="adminLogin()" class="btn-primary">Login</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="page">
+      <div class="user-info">
+        <p>Logged in as: <strong>Admin</strong></p>
+        <button onclick="adminLogout()" class="btn-secondary">Logout</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('pending')">
+          Pending Requests (<span id="pending-count">0</span>)
+        </button>
+        <button class="tab-btn" onclick="switchTab('verified')">
+          Verified Users (<span id="verified-count">0</span>)
+        </button>
+        <button class="tab-btn" onclick="switchTab('all-users')">
+          All Users
+        </button>
+        <button class="tab-btn" onclick="switchTab('stats')">
+          📊 Stats
+        </button>
+      </div>
+
+      <!-- Pending Requests Tab -->
+      <div id="pending-tab" class="tab-content active">
+        <h2>Verification Requests</h2>
+        <div class="refresh-section">
+          <button onclick="loadVerificationRequests()" class="btn-secondary">🔄 Refresh</button>
+        </div>
+        <div id="pending-requests" class="requests-container">
+          <p class="loading">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Verified Users Tab -->
+      <div id="verified-tab" class="tab-content">
+        <h2>Verified Users</h2>
+        <div class="refresh-section">
+          <button onclick="loadVerifiedUsers()" class="btn-secondary">🔄 Refresh</button>
+        </div>
+        <div id="verified-users" class="requests-container">
+          <p class="loading">Loading...</p>
+        </div>
+      </div>
+
+      <!-- All Users Tab -->
+      <div id="all-users-tab" class="tab-content">
+        <h2>All Users</h2>
+        <div class="refresh-section">
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" id="search-input" placeholder="Search by email, username, or name" style="flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px;" />
+            <button onclick="searchUsers()" class="btn-secondary">🔍 Search</button>
+            <button onclick="loadAllUsers()" class="btn-secondary">🔄 Reset</button>
+          </div>
+        </div>
+        <div id="all-users" class="requests-container">
+          <p class="loading">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Statistics Tab -->
+      <div id="stats-tab" class="tab-content">
+        <h2>📊 Dashboard Statistics</h2>
+        <div class="stats-container">
+          <div id="stats-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <p class="loading">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

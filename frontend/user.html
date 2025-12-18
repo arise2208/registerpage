@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeChef Verification - User</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏆 CodeChef Account Verification</h1>
+      <p class="subtitle">Link your CodeChef account securely</p>
+    </header>
+
+    <!-- Landing Page (before login) -->
+    <div id="landing-page" class="page active">
+      <div class="info-box">
+        <h2>How Verification Works</h2>
+        <ol>
+          <li>Sign in with your Google account</li>
+          <li>Enter your CodeChef username</li>
+          <li>We'll give you a unique verification code</li>
+          <li>Submit any solution on CodeChef with the code in your source</li>
+          <li>Provide the submission ID</li>
+          <li>Wait for admin approval</li>
+          <li>Set your password and you're done!</li>
+        </ol>
+        <div class="warning-box">
+          ⚠️ <strong>Important:</strong> One Google account can verify only one CodeChef username.
+          One CodeChef account can only be owned by one person.
+        </div>
+      </div>
+      
+      <div class="login-section">
+        <div id="g_id_onload"
+             data-client_id="615982224780-gdc62i9hs8vgtt8bn9pr8fp4q7rednhd.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div class="g_id_signin" 
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
+        </div>
+      </div>
+    </div>
+
+    <!-- User Dashboard (after login) -->
+    <div id="dashboard-page" class="page">
+      <div class="user-info">
+        <p>Logged in as: <strong id="user-name"></strong> (<span id="user-email"></span>)</p>
+        <button onclick="logout()" class="btn-secondary">Logout</button>
+      </div>
+
+      <!-- Status: NONE -->
+      <div id="status-none" class="status-section">
+        <h2>Step 1: Enter Your CodeChef Username</h2>
+        <div class="form-group">
+          <input type="text" id="codechef-username" placeholder="Your CodeChef username" />
+          <button onclick="submitCodechefUsername()" class="btn-primary">Submit Username</button>
+        </div>
+      </div>
+
+      <!-- Status: PENDING SUBMISSION -->
+      <div id="status-pending-submission" class="status-section">
+        <h2>Step 2: Submit a CodeChef Solution</h2>
+        <div class="info-box">
+          <p><strong>Your CodeChef Username:</strong> <span id="display-codechef"></span></p>
+          <p><strong>Your Verification Code:</strong></p>
+          <div class="code-box">
+            <code id="verification-hex"></code>
+            <button onclick="copyVerificationCode()" class="btn-copy">📋 Copy</button>
+          </div>
+        </div>
+        
+        <div class="instructions">
+          <h3>Instructions:</h3>
+          <ol>
+            <li>Go to <a href="https://www.codechef.com/practice" target="_blank">CodeChef Practice</a></li>
+            <li>Choose any problem and write a solution</li>
+            <li>Add this verification code as a comment at the top of your source code</li>
+            <li>Submit your solution</li>
+            <li>Copy the submission ID and paste it below</li>
+          </ol>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="submission-id" placeholder="Paste submission ID here" />
+          <button onclick="submitSolutionId()" class="btn-primary">Submit for Verification</button>
+        </div>
+      </div>
+
+      <!-- Status: PENDING (waiting for admin) -->
+      <div id="status-pending" class="status-section">
+        <h2>⏳ Verification Pending</h2>
+        <div class="info-box">
+          <p>Your submission is under review by our admin team.</p>
+          <p><strong>CodeChef Username:</strong> <span id="pending-codechef"></span></p>
+          <p><strong>Submission ID:</strong> <span id="pending-submission"></span></p>
+        </div>
+        <button onclick="refreshStatus()" class="btn-secondary">🔄 Refresh Status</button>
+      </div>
+
+      <!-- Status: VERIFIED -->
+      <div id="status-verified" class="status-section">
+        <h2>✅ Account Verified!</h2>
+        <div class="success-box">
+          <p>Congratulations! Your CodeChef account has been verified.</p>
+          <p><strong>CodeChef Username:</strong> <span id="verified-codechef"></span></p>
+        </div>
+        
+        <div id="password-form">
+          <h3>Set Your Password</h3>
+          <div class="form-group">
+            <input type="password" id="new-password" placeholder="Enter password (min 6 chars)" />
+            <input type="password" id="confirm-password" placeholder="Confirm password" />
+            <button onclick="setPassword()" class="btn-primary">Set Password</button>
+          </div>
+        </div>
+
+        <div id="password-already-set" style="display: none;">
+          <div class="success-box">
+            <p>✅ Password already set! Your account is fully active.</p>
+          </div>
+          
+          <h3 style="margin-top: 30px;">Manage Your Account</h3>
+          <div style="margin-top: 15px;">
+            <h4>Change Password</h4>
+            <div class="form-group">
+              <input type="password" id="new-password-change" placeholder="Enter new password (min 6 chars)" />
+              <input type="password" id="confirm-password-change" placeholder="Confirm new password" />
+              <button onclick="changePassword()" class="btn-primary">Change Password</button>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <h4>Delink CodeChef Account</h4>
+            <p style="color: #666; margin-bottom: 10px;">If you want to link a different CodeChef account, delink the current one first.</p>
+            <button onclick="delinkCodechef()" class="btn-danger">🔗 Delink CodeChef Account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status: REJECTED -->
+      <div id="status-rejected" class="status-section">
+        <h2>❌ Verification Rejected</h2>
+        <div class="error-box">
+          <p>Your verification request was rejected. This could be because:</p>
+          <ul>
+            <li>The verification code was not found in your submission</li>
+            <li>The submission username doesn't match your claimed username</li>
+            <li>The CodeChef account is already verified by another user</li>
+          </ul>
+          <p>Please contact support if you believe this is an error.</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+          <h3>Want to try again?</h3>
+          <p style="color: #666; margin-bottom: 15px;">You can appeal this decision and try again with a different CodeChef username or verify that you've fixed the issues.</p>
+          <button onclick="resetVerification()" class="btn-primary">🔄 Try Again with Different ID</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script src="js/user.js"></script>
+</body>
+</html>
