@@ -1,28 +1,26 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 /* ================================
    User Authentication
 ================================ */
 exports.authenticateUser = (req, res, next) => {
-  let token = req.cookies?.accessToken;
-
-  if (!token && req.headers.authorization) {
-    const [type, value] = req.headers.authorization.split(' ');
-    if (type === 'Bearer') token = value;
-  }
+  const token = req.cookies?.userAccessToken;
 
   if (!token) {
-    return res.status(401).json({ error: 'Unauthenticated' });
+    return res.status(401).json({ error: "Unauthenticated" });
   }
 
   try {
     const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    if (payload.isAdmin) {
+      return res.status(403).json({ error: "Admins not allowed here" });
+    }
+
     req.userId = payload.userId;
-    req.tokenVersion = payload.tokenVersion;
-    req.isAdmin = payload.isAdmin;
     next();
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
   }
 };
 
@@ -30,27 +28,22 @@ exports.authenticateUser = (req, res, next) => {
    Admin Authentication
 ================================ */
 exports.authenticateAdmin = (req, res, next) => {
-  let token = req.cookies?.accessToken;
-
-  if (!token && req.headers.authorization) {
-    const [type, value] = req.headers.authorization.split(' ');
-    if (type === 'Bearer') token = value;
-  }
+  const token = req.cookies?.adminAccessToken;
 
   if (!token) {
-    return res.status(401).json({ error: 'Unauthenticated' });
+    return res.status(401).json({ error: "Unauthenticated" });
   }
 
   try {
     const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
     if (!payload.isAdmin) {
-      return res.status(403).json({ error: 'Forbidden' });
+      return res.status(403).json({ error: "Forbidden" });
     }
 
-    req.isAdmin = true;
+    req.isAdmin = true; // ✅ IMPORTANT (you fixed it)
     next();
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
   }
 };

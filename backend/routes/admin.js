@@ -39,12 +39,13 @@ router.post("/login", adminLoginLimiter, async (req, res) => {
     );
 
     // ✅ HttpOnly cookie (REQUIRED)
-    res.cookie("accessToken", token, {
-      httpOnly: true,
-      secure: false, // true in HTTPS production
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    res.cookie("adminAccessToken", token, {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  maxAge: 24 * 60 * 60 * 1000
+});
+
 
     res.json({ message: "Admin login successful" });
 
@@ -58,7 +59,7 @@ router.post("/login", adminLoginLimiter, async (req, res) => {
    Logout
 ================================ */
 router.post("/logout", authenticateAdmin, (req, res) => {
-  res.clearCookie("accessToken");
+  res.clearCookie("adminAccessToken");
   res.json({ message: "Logged out successfully" });
 });
 
