@@ -7,7 +7,6 @@ let currentUser = null;
    Init
 ================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  // Try loading user session on refresh
   loadUserData();
 });
 
@@ -19,7 +18,7 @@ function handleCredentialResponse(response) {
 
   fetch(`${API_URL}/auth/google`, {
     method: "POST",
-    credentials: "include", // 👈 REQUIRED
+    credentials: "include",
     headers: {
       "Content-Type": "application/json"
     },
@@ -47,7 +46,7 @@ function handleCredentialResponse(response) {
 function loadUserData() {
   fetch(`${API_URL}/user/status`, {
     method: "GET",
-    credentials: "include" // 👈 COOKIE AUTH
+    credentials: "include"
   })
     .then(res => {
       if (!res.ok) throw new Error("Not logged in");
@@ -124,7 +123,7 @@ function showDashboard() {
 }
 
 /* ================================
-   User Actions (ALL COOKIE-BASED)
+   User Actions
 ================================ */
 function submitCodechefUsername() {
   const username = document.getElementById("codechef-username").value.trim();
@@ -181,6 +180,31 @@ function setPassword() {
       if (data.error) return showMessage(data.error, "error");
       showMessage("Password set!", "success");
       loadUserData();
+    });
+}
+
+/* ================================
+   🔄 FIXED MISSING FUNCTIONS
+================================ */
+function refreshStatus() {
+  loadUserData();
+}
+
+function resetVerification() {
+  fetch(`${API_URL}/user/reset-verification`, {
+    method: "POST",
+    credentials: "include"
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        return showMessage(data.error, "error");
+      }
+      showMessage("Verification reset successfully!", "success");
+      loadUserData();
+    })
+    .catch(() => {
+      showMessage("Failed to reset verification", "error");
     });
 }
 

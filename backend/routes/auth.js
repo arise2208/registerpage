@@ -96,8 +96,10 @@ router.post("/google", async (req, res) => {
 ================================ */
 router.post("/logout", (req, res) => {
   res.clearCookie("userAccessToken");
+  res.clearCookie("adminAccessToken");
   res.json({ message: "Logged out successfully" });
 });
+
 
 
 module.exports = router;
