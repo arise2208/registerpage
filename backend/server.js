@@ -1,8 +1,8 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
 const app = express();
 
@@ -11,41 +11,52 @@ const app = express();
 // Parse cookies
 app.use(cookieParser());
 
-// CORS configuration (IMPORTANT FOR COOKIES)
+// ✅ Build allowed origins from ENV
+const allowedOrigins = [
+  process.env.USER_FRONTEND_URL,
+  process.env.ADMIN_FRONTEND_URL
+].filter(Boolean); // removes undefined values
+
+// CORS configuration (COOKIE-SAFE)
 app.use(cors({
-  origin: [
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "http://localhost:5173",
-    "http://localhost:3000"
-  ],
-  credentials: true, // 👈 REQUIRED for HttpOnly cookies
+  origin: function (origin, callback) {
+    // Allow requests with no origin (Postman, mobile apps, health checks)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Handle preflight requests
+
 app.options("*", cors());
 
-// Parse JSON body
+
 app.use(express.json());
 
 /* -------------------- MongoDB -------------------- */
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 /* -------------------- Routes -------------------- */
 
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/user', require('./routes/user'));
-app.use('/api/admin', require('./routes/admin'));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/user", require("./routes/user"));
+app.use("/api/admin", require("./routes/admin"));
 
 /* -------------------- Health Check -------------------- */
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "Server is running" });
 });
 
 /* -------------------- Server -------------------- */

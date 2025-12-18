@@ -41,8 +41,8 @@ router.post("/login", adminLoginLimiter, async (req, res) => {
     // ✅ HttpOnly cookie (REQUIRED)
     res.cookie("adminAccessToken", token, {
   httpOnly: true,
-  secure: false,
-  sameSite: "lax",
+  secure: true,
+sameSite: "none",
   maxAge: 24 * 60 * 60 * 1000
 });
 
